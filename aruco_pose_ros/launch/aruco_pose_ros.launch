@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="aruco_pose_ros" type="aruco_pose_node" name="aruco_pose_node" output="screen"/>
+  <!-- <node pkg="aruco_pose_ros" type="image_publisher_node" name="image_publisher_node" output="screen"/> -->
+</launch>
+
