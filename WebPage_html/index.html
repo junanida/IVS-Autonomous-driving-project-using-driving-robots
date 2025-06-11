@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>택시 호출 시스템</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color: #ffc107;
+            width: 100%;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: #212121;
+        }
+
+        .container {
+            margin-top: 40px;
+            padding: 30px 40px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            min-width: 300px;
+            margin-bottom: 30px;
+        }
+
+        .container label {
+            display: block;
+            font-size: 1.1rem;
+            margin-top: 15px;
+        }
+
+        .container input[type="text"] {
+            width: 100%;
+            padding: 8px 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+        .container button {
+            margin: 20px 10px 0 10px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .call-btn {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .call-btn:hover {
+            background-color: #1976d2;
+        }
+
+        .done-btn {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .done-btn:hover {
+            background-color: #388e3c;
+        }
+
+         .pickup-btn {
+        background-color: #ff9800;
+        color: white;
+        }
+
+        .pickup-btn:hover {
+            background-color: #f57c00;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🚖 Pinky 택시 호출 시스템</h1>
+    </header>
+
+    <div class="container">
+        <label>출발지:</label>
+        <input type="text" id="start" required>
+
+        <label>도착지:</label>
+        <input type="text" id="end" required>
+
+        <div>
+            <button onclick="callTaxi()" class="call-btn">🚕 택시 호출</button>
+            <button onclick="pickUp()" class="pickup-btn">🚗 승차 완료</button>
+            <button onclick="dropOff()" class="done-btn">✅ 하차 완료</button>
+        </div>
+
+        <!-- 위치 표시 영역 -->
+        <div style="margin-top: 30px;">
+            <h3>📡 실시간 위치 정보</h3>
+            <p id="positionDisplay" style="font-size: 1.1rem; color: #333;">데이터 없음</p>
+            <p id="position1" style="font-size: 1.1rem; color: #333;">🚘 택시1 위치: 데이터 없음</p>
+            <p id="position2" style="font-size: 1.1rem; color: #333;">🚘 택시2 위치: 데이터 없음</p>
+            <p id="position3" style="font-size: 1.1rem; color: #333;">🚘 택시3 위치: 데이터 없음</p>
+        </div>
+    </div>
+
+    <script>
+        function callTaxi() {
+            const start = document.getElementById('start').value;
+            const end = document.getElementById('end').value;
+
+            fetch('/call_taxi', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ start: start, end: end })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.status))
+            .catch(err => alert('에러 발생: ' + err));
+        }
+
+        function dropOff() {
+            fetch('/drop_off', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => alert(data.status))
+            .catch(err => alert('에러 발생: ' + err));
+        }
+
+        function pickUp() {
+            fetch('/pick_up', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => alert(data.status))
+            .catch(err => alert('에러 발생: ' + err));
+        }
+
+        // 실시간 위치 갱신
+
+    function fetchPosition1() {
+        fetch('/get_position1')
+            .then(res => res.json())
+            .then(data => {
+                const text = `🚘 택시1 위치 - X: ${data.x}, Y: ${data.y}`;
+                document.getElementById('position1').innerText = text;
+            })
+            .catch(() => {
+                document.getElementById('position1').innerText = '❌ 택시1 위치 정보 수신 실패';
+            });
+    }
+
+// 택시 2
+    // function fetchPosition2() {
+    //     fetch('/get_position2')
+    //         .then(res => res.json())
+    //         .then(data => {
+    //             const text = `🚘 택시2 위치 - X: ${data.x}, Y: ${data.y}`;
+    //             document.getElementById('position2').innerText = text;
+    //         })
+    //         .catch(() => {
+    //             document.getElementById('position2').innerText = '❌ 택시2 위치 정보 수신 실패';
+    //         });
+    // }
+
+// 택시 3
+    function fetchPosition3() {
+        fetch('/get_position3')
+            .then(res => res.json())
+            .then(data => {
+                const text = `🚘 택시3 위치 - X: ${data.x}, Y: ${data.y}`;
+                document.getElementById('position3').innerText = text;
+            })
+            .catch(() => {
+                document.getElementById('position3').innerText = '❌ 택시3 위치 정보 수신 실패';
+            });
+    }
+
+    setInterval(() => {
+        fetchPosition1();
+        //fetchPosition2();
+        fetchPosition3();
+    }, 100);
+    </script>
+</body>
+</html>
